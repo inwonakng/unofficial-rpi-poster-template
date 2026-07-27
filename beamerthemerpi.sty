@@ -1,5 +1,5 @@
-% Gemini theme
-% https://github.com/anishathalye/gemini
+% RPI poster theme
+% Based on https://github.com/anishathalye/gemini
 
 % ====================
 % Dependencies
@@ -10,31 +10,63 @@
 \RequirePackage{changepage}
 \RequirePackage{fontspec}
 \RequirePackage{calc}
+\RequirePackage{tikz}
+\usetikzlibrary{backgrounds}
 
 % ====================
 % Fonts
 % ====================
 
-\newfontfamily\Raleway[Ligatures=TeX]{Raleway}
-\newfontfamily\Lato[Ligatures=TeX]{Lato}
+\newfontfamily\RPIGeist[
+  Path=./fonts/,
+  Extension=.otf,
+  UprightFont=*-Regular,
+  ItalicFont=*-RegularItalic,
+  BoldFont=*-Bold,
+  BoldItalicFont=*-BoldItalic,
+  Ligatures=TeX
+]{RPIGeist}
+
+\newfontfamily\RPIGeistMono[
+  Path=./fonts/,
+  Extension=.otf,
+  UprightFont=*-Regular,
+  ItalicFont=*-Italic,
+  BoldFont=*-Bold,
+  BoldItalicFont=*-BoldItalic,
+  Ligatures=TeX
+]{RPIGeistMono}
 
 \usefonttheme{professionalfonts}
 
-\setsansfont{Lato}[
-  UprightFont=*-Light,
-  ItalicFont=*-LightItalic,
-  BoldFont=*-Regular,
-  BoldItalicFont=*-Italic
+\setsansfont{RPIGeist}[
+  Path=./fonts/,
+  Extension=.otf,
+  UprightFont=*-Regular,
+  ItalicFont=*-RegularItalic,
+  BoldFont=*-Bold,
+  BoldItalicFont=*-BoldItalic,
+  Ligatures=TeX
 ]
 
-\setbeamerfont{headline}{family=\Raleway}
+\setmonofont{RPIGeistMono}[
+  Path=./fonts/,
+  Extension=.otf,
+  UprightFont=*-Regular,
+  ItalicFont=*-Italic,
+  BoldFont=*-Bold,
+  BoldItalicFont=*-BoldItalic,
+  Ligatures=TeX
+]
+
+\setbeamerfont{headline}{family=\RPIGeist}
 \setbeamerfont{headline title}{size=\Huge,series=\bfseries}
 \setbeamerfont{headline author}{size=\Large}
 \setbeamerfont{headline institute}{size=\normalsize}
-\setbeamerfont{block title}{family=\Raleway,size=\large,series=\bfseries}
-\setbeamerfont{heading}{family=\Lato,series=\bfseries}
+\setbeamerfont{block title}{family=\RPIGeist,size=\Large,series=\bfseries}
+\setbeamerfont{heading}{family=\RPIGeist,series=\bfseries}
 \setbeamerfont{caption}{size=\small}
-\setbeamerfont{footline}{family=\Raleway,size=\normalsize}
+\setbeamerfont{footline}{family=\RPIGeist,size=\normalsize}
 
 % ====================
 % Macros
@@ -111,6 +143,24 @@
   \setlength{\maxlogowidth}{\maxof{\logoleftwidth}{\logorightwidth}}
 }
 
+\newcommand{\rpitickerbar}[3][white]{%
+  \begingroup
+  \pgfmathsetlengthmacro{\rpitickerunit}{#2/36}%
+  \begin{tikzpicture}[baseline]
+    \path[use as bounding box] (0,0) rectangle (#3,#2);
+    \clip (0,0) rectangle (#3,#2);
+    \begin{scope}[x=\rpitickerunit,y=\rpitickerunit]
+      \foreach \i in {0,...,250}{%
+        \pgfmathsetmacro{\x}{28.159*\i}%
+        \fill[#1] (\x,0) rectangle ++(7.148,18);
+        \fill[#1] (\x+7.148,18) rectangle ++(7.148,18);
+        \fill[#1] (\x+14.296,0) rectangle ++(7.148,36);
+      }%
+    \end{scope}
+  \end{tikzpicture}%
+  \endgroup
+}
+
 % Headline
 \setbeamertemplate{headline}
 {
@@ -151,88 +201,93 @@
         \else\fi
       \end{column}
     \end{columns}
+    \begin{tikzpicture}[remember picture,overlay]
+      \node[anchor=north east,inner sep=0pt]
+        at (current page.north east)
+        {\rotatebox{-90}{\rpitickerbar{0.8cm}{\paperheight}}};
+    \end{tikzpicture}
     \vspace{5ex}
-    \ifbeamercolorempty[bg]{headline rule}{}{
-      \begin{beamercolorbox}[wd=\paperwidth,colsep=0.5ex]{headline rule}\end{beamercolorbox}
-    }
   \end{beamercolorbox}
+}
+
+\newcommand{\rpiblockheading}[2]{%
+  \begingroup
+  \usebeamercolor{#1}%
+  \tikz[baseline=(title.base)]{%
+    \node[
+      text=fg,
+      inner xsep=1.2ex,
+      inner ysep=0.75ex,
+      anchor=base west
+    ] (title) {\usebeamerfont{block title}#2};%
+    \begin{scope}[on background layer]
+      \fill[bg]
+        ([xshift=-2pt]title.north west) -- (title.north east) --
+        ([yshift=4pt]title.south east)
+        .. controls (title.south east) .. ([xshift=-4pt]title.south east) --
+        ([xshift=-2pt]title.south west) -- cycle;
+    \end{scope}%
+  }%
+  \endgroup
 }
 
 % Block
 \setbeamertemplate{block begin}
 {
-  \begin{beamercolorbox}[colsep*=0ex,dp=2ex,center]{block title}
-    \vskip0pt
-    \usebeamerfont{block title}\insertblocktitle
-    \vskip-1.25ex
-    \begin{beamercolorbox}[colsep=0.025ex]{block separator}\end{beamercolorbox}
-  \end{beamercolorbox}
-  {\parskip0pt\par}
+  \begin{beamerboxesrounded}[upper=block body,lower=block body,shadow=false]{}
+  \vskip-6pt
+  \noindent\hspace*{-6bp}\rpiblockheading{block title}{\insertblocktitle}\par
+  \vskip1.25ex
   \usebeamerfont{block body}
-  \vskip-0.5ex
-  \begin{beamercolorbox}[colsep*=0ex]{block body}
+  \noindent\hspace*{1ex}\begin{minipage}{\dimexpr\linewidth-2ex\relax}
   \justifying
   \setlength{\parskip}{1ex}
-  \vskip-2ex
 }
 \setbeamertemplate{block end}
 {
-  \end{beamercolorbox}
-  \vskip0pt
+  \end{minipage}
+  \par\vspace{1.5ex}
+  \end{beamerboxesrounded}
   \vspace*{2ex}
 }
 
 % Alert Block
 \setbeamertemplate{block alerted begin}
 {
-  \begin{beamercolorbox}[colsep*=0ex,dp=2ex,center]{block alerted title}
-    \vskip0pt
-    \usebeamerfont{block title}\insertblocktitle
-    \vskip-1.25ex
-    \begin{beamercolorbox}[colsep=0.025ex]{block alerted separator}\end{beamercolorbox}
-  \end{beamercolorbox}
-  {\parskip0pt\par}
+  \begin{beamerboxesrounded}[upper=block alerted body,lower=block alerted body,shadow=false]{}
+  \vskip-6pt
+  \noindent\hspace*{-6bp}\rpiblockheading{block alerted title}{\insertblocktitle}\par
+  \vskip1.25ex
   \usebeamerfont{block body}
-  \vskip-0.5ex
-  \begin{beamercolorbox}[colsep*=0ex]{block alerted body}
+  \noindent\hspace*{1ex}\begin{minipage}{\dimexpr\linewidth-2ex\relax}
   \justifying
-  \begin{adjustwidth}{1ex}{1ex}
   \setlength{\parskip}{1ex}
-  \vskip-2ex
 }
 \setbeamertemplate{block alerted end}
 {
-  \end{adjustwidth}
-  \vskip1ex
-  \end{beamercolorbox}
-  \vskip0pt
+  \end{minipage}
+  \par\vspace{1.5ex}
+  \end{beamerboxesrounded}
   \vspace*{2ex}
 }
 
 % Example Block
 \setbeamertemplate{block example begin}
 {
-  \begin{beamercolorbox}[colsep*=0ex,dp=2ex,center]{block example title}
-    \vskip0pt
-    \usebeamerfont{block title}\insertblocktitle
-    \vskip-1.25ex
-    \begin{beamercolorbox}[colsep=0.025ex]{block example separator}\end{beamercolorbox}
-  \end{beamercolorbox}
-  {\parskip0pt\par}
+  \begin{beamerboxesrounded}[upper=block example body,lower=block example body,shadow=false]{}
+  \vskip-6pt
+  \noindent\hspace*{-6bp}\rpiblockheading{block example title}{\insertblocktitle}\par
+  \vskip1.25ex
   \usebeamerfont{block body}
-  \vskip-0.5ex
-  \begin{beamercolorbox}[colsep*=0ex]{block example body}
+  \noindent\hspace*{1ex}\begin{minipage}{\dimexpr\linewidth-2ex\relax}
   \justifying
-  \begin{adjustwidth}{1ex}{1ex}
   \setlength{\parskip}{1ex}
-  \vskip-2ex
 }
 \setbeamertemplate{block example end}
 {
-  \end{adjustwidth}
-  \vskip1ex
-  \end{beamercolorbox}
-  \vskip0pt
+  \end{minipage}
+  \par\vspace{1.5ex}
+  \end{beamerboxesrounded}
   \vspace*{2ex}
 }
 
@@ -253,5 +308,10 @@
     \hspace{\sepwidth}
     \vspace{1.5ex}
   \end{beamercolorbox}
+  \begin{tikzpicture}[remember picture,overlay]
+    \node[anchor=north east,inner sep=0pt]
+      at (current page.north east)
+      {\rotatebox{-90}{\rpitickerbar{0.8cm}{\paperheight}}};
+  \end{tikzpicture}
   \else\fi
 }

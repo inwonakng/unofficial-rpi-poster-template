@@ -1,5 +1,5 @@
-% Gemini theme
-% https://github.com/anishathalye/gemini
+% RPI poster theme
+% Based on https://github.com/anishathalye/gemini
 
 \documentclass[final]{beamer}
 
@@ -7,10 +7,8 @@
 % Packages
 % ====================
 
-\usepackage[T1]{fontenc}
-\usepackage{lmodern}
 \usepackage[size=custom,width=120,height=72,scale=1.0]{beamerposter}
-\usetheme{gemini}
+\usetheme{rpi}
 \usecolortheme{rpi}
 \usepackage{graphicx}
 \usepackage{booktabs}
@@ -58,24 +56,13 @@
 
 % use this to include logos on the left and/or right side of the header:
 % \logoright{\includegraphics[height=7cm]{logo1.pdf}}
-% \logoleft{\includegraphics[height=7cm]{logo2.pdf}}
+\logoleft{\includegraphics[height=5cm]{logos/RPI_Logo_Solid_White.pdf}}
 
 % ====================
 % Body
 % ====================
 
 \begin{document}
-
-% Refer to https://github.com/k4rtik/uchicago-poster
-% logo: https://www.cam.ac.uk/brand-resources/about-the-logo/logo-downloads
-\addtobeamertemplate{headline}{}
-{
-    \begin{tikzpicture}[remember picture,overlay]
-      \node [anchor=north west, inner sep=3cm] at ([xshift=0.0cm,yshift=0.5cm]current page.north west)
-      {\includegraphics[height=3.5cm]{logo/Rensselaer Large Logo CMYK-White.png}};
-      
-    \end{tikzpicture}
-}
 
 \begin{frame}[t]
 \begin{columns}[t]
@@ -213,9 +200,6 @@
       \item \textbf{Sed consequat} id ante vel efficitur. Praesent congue massa
         sed est scelerisque, elementum mollis augue iaculis.
         \begin{itemize}
-          \item In sed est finibus, vulputate
-            nunc gravida, pulvinar lorem. In maximus nunc dolor, sed auctor eros
-            porttitor quis.
           \item Fusce ornare dignissim nisi. Nam sit amet risus vel lacus
             tempor tincidunt eu a arcu.
           \item Donec rhoncus vestibulum erat, quis aliquam leo

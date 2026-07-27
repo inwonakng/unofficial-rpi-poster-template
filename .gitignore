@@ -9,3 +9,7 @@
 *.synctex.gz
 *.toc
 *.out
+
+aux/
+out/
+.DS_Store

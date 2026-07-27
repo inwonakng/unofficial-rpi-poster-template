@@ -4,6 +4,10 @@ An unofficial RPI LaTeX [beamerposter] theme, based on [Gemini].
 
 This template uses the updated RPI branding direction with a black primary background, white RPI logo, and bundled RPI Geist fonts.
 
+## Preview
+
+<img src="assets/poster-preview.png" alt="Preview of the RPI poster template" width="650">
+
 ## Dependencies
 
 * A TeX installation that includes [LuaTeX]

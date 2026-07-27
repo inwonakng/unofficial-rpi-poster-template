@@ -17,7 +17,8 @@
 
 % Extra colors
 \definecolor{lightgray}{RGB}{240, 240, 240}
-\definecolor{lightorange}{RGB}{255, 245, 242}
+\definecolor{rpi_alert_tint}{RGB}{255, 246, 245}
+\definecolor{rpi_alert_rule}{RGB}{178, 0, 24}
 
 % ====================
 % Theme
@@ -41,14 +42,14 @@
 \setbeamercolor{block body}{fg=black,bg=white}
 
 % Alert Block
-\setbeamercolor{block alerted title}{fg=white,bg=rpi_black}
-\setbeamercolor{block alerted separator}{bg=rpi_darkgray}
-\setbeamercolor{block alerted body}{fg=black,bg=white}
+\setbeamercolor{block alerted title}{fg=white,bg=rpi_red}
+\setbeamercolor{block alerted separator}{bg=rpi_alert_rule}
+\setbeamercolor{block alerted body}{fg=black,bg=rpi_alert_tint}
 
 % Example Block
-\setbeamercolor{block example title}{fg=white,bg=rpi_black}
+\setbeamercolor{block example title}{fg=white,bg=rpi_darkgray}
 \setbeamercolor{block example separator}{bg=rpi_darkgray}
-\setbeamercolor{block example body}{fg=black,bg=white}
+\setbeamercolor{block example body}{fg=black,bg=lightgray}
 
 % Heading
 \setbeamercolor{heading}{fg=rpi_black}

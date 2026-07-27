@@ -223,8 +223,8 @@
     \begin{scope}[on background layer]
       \fill[bg]
         ([xshift=-2pt]title.north west) -- (title.north east) --
-        ([yshift=4pt]title.south east)
-        .. controls (title.south east) .. ([xshift=-4pt]title.south east) --
+        ([yshift=12pt]title.south east)
+        .. controls (title.south east) .. ([xshift=-12pt]title.south east) --
         ([xshift=-2pt]title.south west) -- cycle;
     \end{scope}%
   }%
@@ -257,7 +257,9 @@
   \begin{beamerboxesrounded}[upper=block alerted body,lower=block alerted body,shadow=false]{}
   \vskip-6pt
   \noindent\hspace*{-6bp}\rpiblockheading{block alerted title}{\insertblocktitle}\par
-  \vskip1.25ex
+  \vskip0.55ex
+  \noindent\hspace*{1ex}{\usebeamercolor[bg]{block alerted separator}\rule{\dimexpr\linewidth-2ex\relax}{0.28ex}}\par
+  \vskip1.15ex
   \usebeamerfont{block body}
   \noindent\hspace*{1ex}\begin{minipage}{\dimexpr\linewidth-2ex\relax}
   \justifying

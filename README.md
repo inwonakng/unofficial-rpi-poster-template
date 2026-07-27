@@ -14,6 +14,7 @@ This template uses the updated RPI branding direction with a black primary backg
 * `latexmk`
 * LaTeX package dependencies including beamerposter, Beamer, TikZ, and PGFPlots
 * The bundled RPI Geist font files in `fonts/`
+* Optional for preview generation: Poppler's `pdftoppm`
 
 ## Usage
 
@@ -23,6 +24,12 @@ This template uses the updated RPI branding direction with a black primary backg
 
    ```sh
    latexmk poster.tex
+   ```
+
+4. Generate or refresh the PNG preview from the PDF with:
+
+   ```sh
+   scripts/generate-preview.sh
    ```
 
 The poster uses `\usetheme{rpi}` and `\usecolortheme{rpi}` by default.

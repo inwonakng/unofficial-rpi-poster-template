@@ -6,6 +6,7 @@
 % ====================
 
 \RequirePackage{exscale}
+\RequirePackage{etoolbox}
 \RequirePackage{ragged2e}
 \RequirePackage{changepage}
 \RequirePackage{fontspec}
@@ -64,6 +65,7 @@
 \setbeamerfont{headline author}{size=\Large}
 \setbeamerfont{headline institute}{size=\normalsize}
 \setbeamerfont{block title}{family=\RPIGeist,size=\Large,series=\bfseries}
+\setbeamerfont{block body}{family=\RPIGeist,size=\large}
 \setbeamerfont{heading}{family=\RPIGeist,series=\bfseries}
 \setbeamerfont{caption}{size=\small}
 \setbeamerfont{footline}{family=\RPIGeist,size=\normalsize}
@@ -121,6 +123,136 @@
   \par\bigskip
   {\usebeamerfont{heading}\usebeamercolor[fg]{heading}#1}\par\smallskip
 }
+
+\newlength{\blocksepheight}
+\setlength{\blocksepheight}{2ex}
+\newcommand{\blockseparator}{\par\vspace{\blocksepheight}}
+
+% Poster row/column layout helpers.
+% \pcolumnsepwidth controls the horizontal gap between adjacent \pcolumn environments.
+% \begin{pframe} ... \end{pframe} wraps a beamer frame and adds the same gap at
+% the left and right edges.
+% \begin{prow} ... \end{prow} only adds gaps between adjacent columns, which is
+% useful for nested rows inside a wider column.
+\newlength{\pcolumnsepwidth}
+\setlength{\pcolumnsepwidth}{0.025\paperwidth}
+\NewDocumentEnvironment{prow}{O{0pt}}
+{%
+  \par\nointerlineskip\noindent%
+  \begingroup%
+  \setlength{\parindent}{0pt}%
+  \leavevmode\hbox\bgroup%
+  \hspace{#1}%
+  \ignorespaces%
+}
+{%
+  \unskip%
+  \hspace{\dimexpr#1-\pcolumnsepwidth\relax}%
+  \egroup%
+  \endgroup%
+  \par%
+  \ignorespacesafterend%
+}
+\NewDocumentEnvironment{pframe}{O{t} +b}
+{%
+  \begin{frame}[#1]%
+    \begin{prow}[\pcolumnsepwidth]%
+      #2%
+    \end{prow}%
+  \end{frame}%
+}
+{}
+\NewDocumentEnvironment{pcolumn}{m +b}
+{%
+  \begin{minipage}[t]{#1}%
+    #2%
+    \unskip%
+  \end{minipage}%
+  \hspace{\pcolumnsepwidth}%
+  \ignorespacesafterend%
+}
+{}
+\newif\ifrpipblockactive
+
+% Minimum-height poster block.
+% Usage: \begin{pblock}[<block type>]{<title>}{<total block height>} ... \end{pblock}
+% The optional block type defaults to block and can be set to alert or example.
+% If the contents need more than <total block height>, the block grows to avoid overprinting later content.
+% pblock adds trailing vertical space; pcolumn removes the final trailing space in each column.
+\newcommand{\rpipblockenvname}[1]{%
+  \def\rpipblockenv{#1}%
+  \ifstrequal{#1}{alert}{\def\rpipblockenv{alertblock}}{}%
+  \ifstrequal{#1}{example}{\def\rpipblockenv{exampleblock}}{}%
+}
+\newsavebox{\rpipblockbodybox}
+\newsavebox{\rpipblocktrialbox}
+\newlength{\rpipblockbodyheight}
+\newlength{\rpipblocktargetheight}
+\newlength{\rpipblockbodytargetheight}
+\newlength{\rpipblockbodywidth}
+\newlength{\rpipblocktrialheight}
+\newlength{\rpipblockextraheight}
+\NewDocumentEnvironment{pblock}{O{block} m m +b}
+{%
+  \rpipblockenvname{#1}%
+  \setlength{\rpipblocktargetheight}{#3}%
+  \setlength{\rpipblockbodywidth}{\dimexpr\linewidth-2ex\relax}%
+  \setbox\rpipblockbodybox=\vbox{%
+    \hsize=\rpipblockbodywidth
+    \linewidth=\hsize
+    \columnwidth=\hsize
+    \begin{minipage}[t]{\rpipblockbodywidth}%
+      \justifying
+      \setlength{\parskip}{1ex}%
+      #4%
+    \end{minipage}%
+  }%
+  \setlength{\rpipblockbodyheight}{\dimexpr\ht\rpipblockbodybox+\dp\rpipblockbodybox\relax}%
+  \setlength{\rpipblockbodytargetheight}{\rpipblockbodyheight}%
+  \setbox\rpipblocktrialbox=\vbox{%
+    \hsize=\linewidth
+    \linewidth=\hsize
+    \columnwidth=\hsize
+    \global\rpipblockactivetrue
+    \begin{\rpipblockenv}{#2}%
+      \begin{minipage}[t][\rpipblockbodytargetheight][t]{\linewidth}%
+        \noindent\copy\rpipblockbodybox
+      \end{minipage}%
+    \end{\rpipblockenv}%
+    \global\rpipblockactivefalse
+  }%
+  \setlength{\rpipblocktrialheight}{\dimexpr\ht\rpipblocktrialbox+\dp\rpipblocktrialbox\relax}%
+  \ifdim\rpipblocktrialheight<\rpipblocktargetheight
+    \setlength{\rpipblockextraheight}{\dimexpr\rpipblocktargetheight-\rpipblocktrialheight\relax}%
+    \addtolength{\rpipblockbodytargetheight}{\rpipblockextraheight}%
+  \fi
+  \setbox\rpipblocktrialbox=\vbox{%
+    \hsize=\linewidth
+    \linewidth=\hsize
+    \columnwidth=\hsize
+    \global\rpipblockactivetrue
+    \begin{\rpipblockenv}{#2}%
+      \begin{minipage}[t][\rpipblockbodytargetheight][t]{\linewidth}%
+        \noindent\copy\rpipblockbodybox
+      \end{minipage}%
+    \end{\rpipblockenv}%
+    \global\rpipblockactivefalse
+  }%
+  \setlength{\rpipblocktrialheight}{\dimexpr\ht\rpipblocktrialbox+\dp\rpipblocktrialbox\relax}%
+  \ifdim\rpipblocktrialheight<\rpipblocktargetheight
+    \setlength{\rpipblockextraheight}{\dimexpr\rpipblocktargetheight-\rpipblocktrialheight\relax}%
+    \addtolength{\rpipblockbodytargetheight}{\rpipblockextraheight}%
+  \fi
+  \global\rpipblockactivetrue
+  \begin{\rpipblockenv}{#2}%
+    \begin{minipage}[t][\rpipblockbodytargetheight][t]{\linewidth}%
+      \noindent\box\rpipblockbodybox
+    \end{minipage}%
+  \end{\rpipblockenv}%
+  \global\rpipblockactivefalse
+  \blockseparator%
+}
+{}
 
 % logo
 \newlength{\logoleftwidth}
@@ -248,7 +380,7 @@
   \end{minipage}
   \par\vspace{1.5ex}
   \end{beamerboxesrounded}
-  \vspace*{2ex}
+  \ifrpipblockactive\else\vspace*{\blocksepheight}\fi
 }
 
 % Alert Block
@@ -270,7 +402,7 @@
   \end{minipage}
   \par\vspace{1.5ex}
   \end{beamerboxesrounded}
-  \vspace*{2ex}
+  \ifrpipblockactive\else\vspace*{\blocksepheight}\fi
 }
 
 % Example Block
@@ -290,7 +422,7 @@
   \end{minipage}
   \par\vspace{1.5ex}
   \end{beamerboxesrounded}
-  \vspace*{2ex}
+  \ifrpipblockactive\else\vspace*{\blocksepheight}\fi
 }
 
 % Footer
@@ -303,11 +435,11 @@
       \begin{beamercolorbox}[wd=\paperwidth,colsep=0.25ex]{headline rule}\end{beamercolorbox}
     }
     \vspace{1.5ex}
-    \hspace{\sepwidth}
+    \hspace{\pcolumnsepwidth}
     \usebeamerfont{footline}
     \centering
     \insertfootercontent
-    \hspace{\sepwidth}
+    \hspace{\pcolumnsepwidth}
     \vspace{1.5ex}
   \end{beamercolorbox}
   \begin{tikzpicture}[remember picture,overlay]

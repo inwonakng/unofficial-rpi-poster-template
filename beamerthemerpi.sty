@@ -128,6 +128,16 @@
 \setlength{\blocksepheight}{2ex}
 \newcommand{\blockseparator}{\par\vspace{\blocksepheight}}
 
+\newlength{\rpiblockbodyxpad}
+\setlength{\rpiblockbodyxpad}{16pt}
+\newlength{\rpiblockbodybottompad}
+\setlength{\rpiblockbodybottompad}{24pt}
+\newcommand{\rpiblockbodysetup}{%
+  \usebeamerfont{block body}%
+  \justifying
+  \setlength{\parskip}{1ex}%
+}
+
 % Poster row/column layout helpers.
 % \pcolumnsepwidth controls the horizontal gap between adjacent \pcolumn environments.
 % \begin{pframe} ... \end{pframe} wraps a beamer frame and adds the same gap at
@@ -196,14 +206,13 @@
 {%
   \rpipblockenvname{#1}%
   \setlength{\rpipblocktargetheight}{#3}%
-  \setlength{\rpipblockbodywidth}{\dimexpr\linewidth-2ex\relax}%
+  \setlength{\rpipblockbodywidth}{\dimexpr\linewidth-\rpiblockbodyxpad-\rpiblockbodyxpad\relax}%
   \setbox\rpipblockbodybox=\vbox{%
     \hsize=\rpipblockbodywidth
     \linewidth=\hsize
     \columnwidth=\hsize
     \begin{minipage}[t]{\rpipblockbodywidth}%
-      \justifying
-      \setlength{\parskip}{1ex}%
+      \rpiblockbodysetup
       #4%
     \end{minipage}%
   }%
@@ -370,15 +379,13 @@
   \vskip-6pt
   \noindent\hspace*{-6bp}\rpiblockheading{block title}{\insertblocktitle}\par
   \vskip1.25ex
-  \usebeamerfont{block body}
-  \noindent\hspace*{1ex}\begin{minipage}{\dimexpr\linewidth-2ex\relax}
-  \justifying
-  \setlength{\parskip}{1ex}
+  \noindent\hspace*{\rpiblockbodyxpad}\begin{minipage}{\dimexpr\linewidth-\rpiblockbodyxpad-\rpiblockbodyxpad\relax}
+  \rpiblockbodysetup
 }
 \setbeamertemplate{block end}
 {
   \end{minipage}
-  \par\vspace{1.5ex}
+  \par\vspace{\rpiblockbodybottompad}
   \end{beamerboxesrounded}
   \ifrpipblockactive\else\vspace*{\blocksepheight}\fi
 }
@@ -390,17 +397,15 @@
   \vskip-6pt
   \noindent\hspace*{-6bp}\rpiblockheading{block alerted title}{\insertblocktitle}\par
   \vskip0.55ex
-  \noindent\hspace*{1ex}{\usebeamercolor[bg]{block alerted separator}\rule{\dimexpr\linewidth-2ex\relax}{0.28ex}}\par
+  \noindent\hspace*{\rpiblockbodyxpad}{\usebeamercolor[bg]{block alerted separator}\rule{\dimexpr\linewidth-\rpiblockbodyxpad-\rpiblockbodyxpad\relax}{0.28ex}}\par
   \vskip1.15ex
-  \usebeamerfont{block body}
-  \noindent\hspace*{1ex}\begin{minipage}{\dimexpr\linewidth-2ex\relax}
-  \justifying
-  \setlength{\parskip}{1ex}
+  \noindent\hspace*{\rpiblockbodyxpad}\begin{minipage}{\dimexpr\linewidth-\rpiblockbodyxpad-\rpiblockbodyxpad\relax}
+  \rpiblockbodysetup
 }
 \setbeamertemplate{block alerted end}
 {
   \end{minipage}
-  \par\vspace{1.5ex}
+  \par\vspace{\rpiblockbodybottompad}
   \end{beamerboxesrounded}
   \ifrpipblockactive\else\vspace*{\blocksepheight}\fi
 }
@@ -412,15 +417,13 @@
   \vskip-6pt
   \noindent\hspace*{-6bp}\rpiblockheading{block example title}{\insertblocktitle}\par
   \vskip1.25ex
-  \usebeamerfont{block body}
-  \noindent\hspace*{1ex}\begin{minipage}{\dimexpr\linewidth-2ex\relax}
-  \justifying
-  \setlength{\parskip}{1ex}
+  \noindent\hspace*{\rpiblockbodyxpad}\begin{minipage}{\dimexpr\linewidth-\rpiblockbodyxpad-\rpiblockbodyxpad\relax}
+  \rpiblockbodysetup
 }
 \setbeamertemplate{block example end}
 {
   \end{minipage}
-  \par\vspace{1.5ex}
+  \par\vspace{\rpiblockbodybottompad}
   \end{beamerboxesrounded}
   \ifrpipblockactive\else\vspace*{\blocksepheight}\fi
 }

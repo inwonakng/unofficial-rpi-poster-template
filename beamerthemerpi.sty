@@ -351,33 +351,80 @@
   \end{beamercolorbox}
 }
 
-\newcommand{\rpiblockheading}[2]{%
+\newsavebox{\rpiblockcontentbox}
+\newsavebox{\rpiblocktitlebox}
+\newlength{\rpiblockcontentheight}
+\newlength{\rpiblocktitlewidth}
+\newlength{\rpiblocktitleheight}
+\newlength{\rpiblocktitlexpad}
+\newlength{\rpiblocktitleypad}
+\newlength{\rpiblocktitlebaseline}
+\newlength{\rpiblocktotalheight}
+\newlength{\rpiblockcornerradius}
+\newlength{\rpiblockheaderradius}
+\setlength{\rpiblockcornerradius}{8pt}
+\setlength{\rpiblockheaderradius}{12pt}
+
+\newcommand{\rpiblockcapturebegin}[1]{%
+  \setbox\rpiblockcontentbox=\vbox\bgroup
+    \hsize=\linewidth
+    \linewidth=\hsize
+    \columnwidth=\hsize
+    \setlength{\parindent}{0pt}%
+    \usebeamercolor[fg]{#1}%
+}
+\newcommand{\rpiblockcaptureend}{\egroup}
+
+\newcommand{\rpirenderblock}[3]{%
   \begingroup
+  \usebeamercolor{#2}%
+  \colorlet{rpiblockbodybg}{bg}%
   \usebeamercolor{#1}%
-  \tikz[baseline=(title.base)]{%
-    \node[
-      text=fg,
-      inner xsep=1.2ex,
-      inner ysep=0.75ex,
-      anchor=base west
-    ] (title) {\usebeamerfont{block title}#2};%
-    \begin{scope}[on background layer]
-      \fill[bg]
-        ([xshift=-2pt]title.north west) -- (title.north east) --
-        ([yshift=12pt]title.south east)
-        .. controls (title.south east) .. ([xshift=-12pt]title.south east) --
-        ([xshift=-2pt]title.south west) -- cycle;
-    \end{scope}%
-  }%
+  \colorlet{rpiblocktitlebg}{bg}%
+  \colorlet{rpiblocktitlefg}{fg}%
+  \usebeamerfont{block title}%
+  \setlength{\rpiblocktitlexpad}{1.2ex}%
+  \setlength{\rpiblocktitleypad}{0.75ex}%
+  \setbox\rpiblocktitlebox=\hbox{\color{rpiblocktitlefg}\usebeamerfont{block title}#3}%
+  \setlength{\rpiblocktitlewidth}{\dimexpr\wd\rpiblocktitlebox+2\rpiblocktitlexpad\relax}%
+  \setlength{\rpiblocktitleheight}{\dimexpr\ht\rpiblocktitlebox+\dp\rpiblocktitlebox+2\rpiblocktitleypad\relax}%
+  \setlength{\rpiblocktitlebaseline}{\dimexpr\rpiblocktitleypad+\ht\rpiblocktitlebox\relax}%
+  \setlength{\rpiblockcontentheight}{\dimexpr\ht\rpiblockcontentbox+\dp\rpiblockcontentbox\relax}%
+  \setlength{\rpiblocktotalheight}{\dimexpr\rpiblocktitleheight+\rpiblockcontentheight\relax}%
+  \par\noindent
+  \begin{tikzpicture}[baseline=(rpiblockbase.base)]
+    \coordinate (rpiblockbase) at (0pt,\dimexpr-\rpiblocktotalheight\relax);
+    \path[use as bounding box]
+      (0pt,0pt) rectangle (\linewidth,\dimexpr-\rpiblocktotalheight\relax);
+    \fill[rpiblockbodybg]
+      (\rpiblocktitlewidth,0pt) --
+      (\dimexpr\linewidth-\rpiblockcornerradius\relax,0pt)
+      arc[start angle=90,end angle=0,radius=\rpiblockcornerradius] --
+      (\linewidth,\dimexpr-\rpiblocktotalheight\relax) --
+      (0pt,\dimexpr-\rpiblocktotalheight\relax) --
+      (0pt,\dimexpr-\rpiblocktitleheight\relax) --
+      (\dimexpr\rpiblocktitlewidth-\rpiblockheaderradius\relax,\dimexpr-\rpiblocktitleheight\relax)
+      arc[start angle=-90,end angle=0,radius=\rpiblockheaderradius] -- cycle;
+    \fill[rpiblocktitlebg]
+      (0pt,0pt) -- (\rpiblocktitlewidth,0pt) --
+      (\rpiblocktitlewidth,\dimexpr-\rpiblocktitleheight+\rpiblockheaderradius\relax)
+      arc[start angle=0,end angle=-90,radius=\rpiblockheaderradius] --
+      (0pt,\dimexpr-\rpiblocktitleheight\relax) -- cycle;
+    \node[anchor=base west,inner sep=0pt,outer sep=0pt]
+      at (\rpiblocktitlexpad,\dimexpr-\rpiblocktitlebaseline\relax)
+      {\box\rpiblocktitlebox};
+    \node[anchor=north west,inner sep=0pt,outer sep=0pt]
+      at (0pt,\dimexpr-\rpiblocktitleheight\relax)
+      {\box\rpiblockcontentbox};
+  \end{tikzpicture}%
+  \par
   \endgroup
 }
 
 % Block
 \setbeamertemplate{block begin}
 {
-  \begin{beamerboxesrounded}[upper=block body,lower=block body,shadow=false]{}
-  \vskip-6pt
-  \noindent\hspace*{-6bp}\rpiblockheading{block title}{\insertblocktitle}\par
+  \rpiblockcapturebegin{block body}
   \vskip1.25ex
   \noindent\hspace*{\rpiblockbodyxpad}\begin{minipage}{\dimexpr\linewidth-\rpiblockbodyxpad-\rpiblockbodyxpad\relax}
   \rpiblockbodysetup
@@ -386,16 +433,15 @@
 {
   \end{minipage}
   \par\vspace{\rpiblockbodybottompad}
-  \end{beamerboxesrounded}
+  \rpiblockcaptureend
+  \rpirenderblock{block title}{block body}{\insertblocktitle}%
   \ifrpipblockactive\else\vspace*{\blocksepheight}\fi
 }
 
 % Alert Block
 \setbeamertemplate{block alerted begin}
 {
-  \begin{beamerboxesrounded}[upper=block alerted body,lower=block alerted body,shadow=false]{}
-  \vskip-6pt
-  \noindent\hspace*{-6bp}\rpiblockheading{block alerted title}{\insertblocktitle}\par
+  \rpiblockcapturebegin{block alerted body}
   \vskip0.55ex
   \noindent\hspace*{\rpiblockbodyxpad}{\usebeamercolor[bg]{block alerted separator}\rule{\dimexpr\linewidth-\rpiblockbodyxpad-\rpiblockbodyxpad\relax}{0.28ex}}\par
   \vskip1.15ex
@@ -406,16 +452,15 @@
 {
   \end{minipage}
   \par\vspace{\rpiblockbodybottompad}
-  \end{beamerboxesrounded}
+  \rpiblockcaptureend
+  \rpirenderblock{block alerted title}{block alerted body}{\insertblocktitle}%
   \ifrpipblockactive\else\vspace*{\blocksepheight}\fi
 }
 
 % Example Block
 \setbeamertemplate{block example begin}
 {
-  \begin{beamerboxesrounded}[upper=block example body,lower=block example body,shadow=false]{}
-  \vskip-6pt
-  \noindent\hspace*{-6bp}\rpiblockheading{block example title}{\insertblocktitle}\par
+  \rpiblockcapturebegin{block example body}
   \vskip1.25ex
   \noindent\hspace*{\rpiblockbodyxpad}\begin{minipage}{\dimexpr\linewidth-\rpiblockbodyxpad-\rpiblockbodyxpad\relax}
   \rpiblockbodysetup
@@ -424,7 +469,8 @@
 {
   \end{minipage}
   \par\vspace{\rpiblockbodybottompad}
-  \end{beamerboxesrounded}
+  \rpiblockcaptureend
+  \rpirenderblock{block example title}{block example body}{\insertblocktitle}%
   \ifrpipblockactive\else\vspace*{\blocksepheight}\fi
 }
 
